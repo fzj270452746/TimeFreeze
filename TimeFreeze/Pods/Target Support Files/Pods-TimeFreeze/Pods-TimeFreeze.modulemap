@@ -1,0 +1,6 @@
+framework module Pods_TimeFreeze {
+  umbrella header "Pods-TimeFreeze-umbrella.h"
+
+  export *
+  module * { export * }
+}
