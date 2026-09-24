@@ -51,10 +51,22 @@ final class GameCoordinator {
     }
 
     func showMenu(push: Bool = false) {
+        // First run goes through the onboarding rather than straight to the
+        // menu, so the hook — world time stops, your hands do not — lands before
+        // any level does.
+        if !SaveStore.shared.progress.hasSeenOnboarding {
+            showOnboarding()
+            return
+        }
         if push { navigationStack.append(flowState) }
         flowState = .menu
         activeGameScene = nil
         present(MainMenuScene(size: sceneSize), transition: menuTransition())
+    }
+
+    func showOnboarding() {
+        flowState = .onboarding
+        present(OnboardingScene(size: sceneSize), transition: .crossFade(withDuration: 0.15))
     }
 
     func showChapters() {
@@ -81,6 +93,12 @@ final class GameCoordinator {
         navigationStack.append(flowState)
         flowState = .mastery
         present(MasteryScene(size: sceneSize), transition: forwardTransition())
+    }
+
+    func showSkins() {
+        navigationStack.append(flowState)
+        flowState = .skins
+        present(SkinsScene(size: sceneSize), transition: forwardTransition())
     }
 
     func showLeaderboard(board: LeaderboardBoard = .campaign, push: Bool = true) {
@@ -220,6 +238,7 @@ final class GameCoordinator {
         case .levelSelect: showLevelsWithoutPush(chapter: selectedChapter)
         case .settings: showSettingsWithoutPush()
         case .mastery: showMasteryWithoutPush()
+        case .skins: showSkinsWithoutPush()
         // Restores whichever board was on screen. Passing no board used to fall
         // back to the `.campaign` default, so backing out of any other tab
         // landed the player on the campaign board.
@@ -296,6 +315,11 @@ final class GameCoordinator {
     private func showMasteryWithoutPush() {
         flowState = .mastery
         present(MasteryScene(size: sceneSize), transition: backTransition())
+    }
+
+    private func showSkinsWithoutPush() {
+        flowState = .skins
+        present(SkinsScene(size: sceneSize), transition: backTransition())
     }
 
     private func menuTransition() -> SKTransition {

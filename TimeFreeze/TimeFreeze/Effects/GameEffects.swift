@@ -34,6 +34,53 @@ final class GameEffects {
         ]))
     }
 
+    /// A denser freeze burst for the instant world time stops: the expanding
+    /// wave plus a short halo and a scatter of sparks. Kept alongside
+    /// `emitFreezeWave` rather than replacing it, so the quieter effect can
+    /// still be used where a full burst would be noise.
+    func emitFreezeBurst(at position: CGPoint, maximumRadius: CGFloat) {
+        guard let container else { return }
+        emitFreezeWave(at: position, maximumRadius: maximumRadius)
+        guard !SaveStore.shared.settings.reduceMotion else { return }
+
+        let halo = SKShapeNode(circleOfRadius: 12)
+        halo.name = Self.waveName
+        halo.position = position
+        halo.fillColor = GameTheme.freezeBlue.withAlphaComponent(0.20)
+        halo.strokeColor = GameTheme.freezeWhite
+        halo.lineWidth = 2
+        halo.glowWidth = 8
+        halo.zPosition = 119
+        container.addChild(halo)
+        halo.run(.sequence([
+            .group([.scale(to: maximumRadius / 12, duration: 0.22), .fadeOut(withDuration: 0.22)]),
+            .removeFromParent()
+        ]))
+
+        for index in 0..<10 {
+            let angle = CGFloat(index) * .pi * 2 / 10
+            let spark = SKShapeNode(circleOfRadius: 2.4)
+            spark.name = Self.waveName
+            spark.position = position
+            spark.fillColor = index % 3 == 0 ? GameTheme.freezeWhite : GameTheme.freezeBlue
+            spark.strokeColor = .clear
+            spark.glowWidth = 2
+            spark.zPosition = 121
+            container.addChild(spark)
+            let distance = maximumRadius * (0.16 + CGFloat(index % 4) * 0.07)
+            spark.run(.sequence([
+                .group([
+                    .move(
+                        to: CGPoint(x: position.x + cos(angle) * distance, y: position.y + sin(angle) * distance),
+                        duration: 0.30
+                    ),
+                    .fadeOut(withDuration: 0.30)
+                ]),
+                .removeFromParent()
+            ]))
+        }
+    }
+
     /// Cancels any shockwave still in flight so a reset or teardown never leaves
     /// a ring stranded on the board.
     func clear() {

@@ -80,6 +80,12 @@ final class SaveStore {
         scheduleSave()
     }
 
+    func markOnboardingSeen() {
+        guard !progress.hasSeenOnboarding else { return }
+        progress.hasSeenOnboarding = true
+        scheduleSave()
+    }
+
     func updateSettings(_ transform: (inout GameSettings) -> Void) {
         transform(&settings)
         if let data = try? encoder.encode(settings) {

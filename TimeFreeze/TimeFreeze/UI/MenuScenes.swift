@@ -4,6 +4,7 @@ import UIKit
 final class LaunchScene: BaseScene {
     override func didMove(to view: SKView) {
         super.didMove(to: view)
+        let accent = SaveStore.shared.settings.tileSkin.accent
         let emblem = ClockEmblemNode(radius: 64)
         emblem.position = CGPoint(x: 0, y: 76)
         addChild(emblem)
@@ -15,7 +16,7 @@ final class LaunchScene: BaseScene {
         freeze.fontName = GameTheme.titleFont(size: 40).fontName
         freeze.position = CGPoint(x: 0, y: -65)
         addChild(freeze)
-        let subtitle = GameTheme.label("CHRONO MAHJONG  //  SYSTEM 01", size: 9, color: GameTheme.freezeBlue, weight: .bold)
+        let subtitle = GameTheme.label("CHRONO MAHJONG  //  SYSTEM 01", size: 9, color: accent, weight: .bold)
         subtitle.position = CGPoint(x: 0, y: -105)
         addChild(subtitle)
         if !SaveStore.shared.settings.reduceMotion {
@@ -33,9 +34,10 @@ final class LaunchScene: BaseScene {
 final class ClockEmblemNode: SKNode {
     init(radius: CGFloat) {
         super.init()
+        let accent = SaveStore.shared.settings.tileSkin.accent
         let outer = SKShapeNode(circleOfRadius: radius)
         outer.fillColor = GameTheme.panel
-        outer.strokeColor = GameTheme.freezeBlue
+        outer.strokeColor = accent
         outer.lineWidth = 2
         outer.glowWidth = 3
         addChild(outer)
@@ -46,12 +48,12 @@ final class ClockEmblemNode: SKNode {
         addChild(inner)
         let core = SKShapeNode(circleOfRadius: radius - 18)
         core.fillColor = GameTheme.boardDark
-        core.strokeColor = GameTheme.freezeBlue.withAlphaComponent(0.22)
+        core.strokeColor = accent.withAlphaComponent(0.22)
         core.lineWidth = 1
         addChild(core)
         for index in 0..<12 {
             let tick = SKShapeNode(rectOf: CGSize(width: index % 3 == 0 ? 3 : 1.5, height: index % 3 == 0 ? 11 : 6), cornerRadius: 0.8)
-            tick.fillColor = index % 4 == 0 ? GameTheme.vermilion : GameTheme.freezeBlue
+            tick.fillColor = index % 4 == 0 ? GameTheme.vermilion : accent
             tick.strokeColor = .clear
             tick.position = CGPoint(x: 0, y: radius - 17).rotated(by: -CGFloat(index) * .pi / 6)
             tick.zRotation = -CGFloat(index) * .pi / 6
@@ -59,7 +61,7 @@ final class ClockEmblemNode: SKNode {
         }
         for index in 0..<8 {
             let segment = SKShapeNode(rectOf: CGSize(width: radius * 0.30, height: 3))
-            segment.fillColor = index % 3 == 0 ? GameTheme.vermilion : GameTheme.freezeBlue
+            segment.fillColor = index % 3 == 0 ? GameTheme.vermilion : accent
             segment.strokeColor = .clear
             segment.position = CGPoint(x: 0, y: radius + 7).rotated(by: CGFloat(index) * .pi / 4)
             segment.zRotation = -CGFloat(index) * .pi / 4
@@ -71,7 +73,8 @@ final class ClockEmblemNode: SKNode {
             face: .redDragon,
             team: .ivory,
             size: CGSize(width: radius * 0.62, height: radius * 0.82),
-            compact: true
+            compact: true,
+            skin: SaveStore.shared.settings.tileSkin
         )
         tile.setScale(0.92)
         addChild(tile)
@@ -117,10 +120,11 @@ final class MainMenuScene: BaseScene {
     }
 
     private func buildTitle() {
+        let accent = SaveStore.shared.settings.tileSkin.accent
         let emblem = ClockEmblemNode(radius: 43)
         emblem.position = CGPoint(x: 106, y: safeTop - 125)
         addChild(emblem)
-        let system = GameTheme.label("CHRONO MAHJONG  //  01", size: 9, color: GameTheme.freezeBlue, weight: .bold, alignment: .left)
+        let system = GameTheme.label("CHRONO MAHJONG  //  01", size: 9, color: accent, weight: .bold, alignment: .left)
         system.position = CGPoint(x: -145, y: safeTop - 70)
         addChild(system)
         let time = GameTheme.label("TIME", size: 20, color: GameTheme.textSecondary, weight: .bold, alignment: .left)
@@ -167,7 +171,8 @@ final class MainMenuScene: BaseScene {
             ("endless", GameText.endless, "\u{221E}"),
             ("leaderboard", GameText.leaderboard, "trophy.fill"),
             ("mastery", GameText.achievements, "\u{2605}"),
-            ("settings", GameText.settings, "\u{2699}")
+            ("settings", GameText.settings, "\u{2699}"),
+            ("skins", GameText.skins, "paintpalette.fill")
         ]
         let buttonWidth = (min(340, size.width - 40) - 10) / 2
         for (index, item) in items.enumerated() {
@@ -225,6 +230,7 @@ final class MainMenuScene: BaseScene {
         case "leaderboard": GameCoordinator.shared.showLeaderboard()
         case "mastery": GameCoordinator.shared.showMastery()
         case "settings": GameCoordinator.shared.showSettings()
+        case "skins": GameCoordinator.shared.showSkins()
         default: break
         }
     }

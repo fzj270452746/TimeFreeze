@@ -518,10 +518,15 @@ class BaseScene: SKScene, PressableNodeDelegate {
     func buildBackground() {
         buildBackdrop()
         backgroundLayer.removeAllChildren()
+        // The decorative chrome takes its accent from the equipped skin, so a
+        // skin changes the whole room rather than just the tiles. The vermilion
+        // contrast marks stay fixed to keep the warm/cool split the scene reads
+        // from.
+        let accent = SaveStore.shared.settings.tileSkin.accent
         let viewportSize = CGSize(width: max(0, size.width - 18), height: max(0, size.height - 26))
         let viewport = SKShapeNode(path: GameTheme.chamferedPath(size: viewportSize, cut: 14))
         viewport.fillColor = hasBackdrop ? GameTheme.boardDark.withAlphaComponent(0.40) : GameTheme.boardDark
-        viewport.strokeColor = GameTheme.freezeBlue.withAlphaComponent(0.25)
+        viewport.strokeColor = accent.withAlphaComponent(0.25)
         viewport.lineWidth = 1
         backgroundLayer.addChild(viewport)
 
@@ -530,7 +535,7 @@ class BaseScene: SKScene, PressableNodeDelegate {
             let radius = CGFloat(96 + index * 28)
             let ring = SKShapeNode(circleOfRadius: radius)
             ring.fillColor = .clear
-            ring.strokeColor = (index == 1 ? GameTheme.vermilion : GameTheme.freezeBlue).withAlphaComponent(index == 1 ? 0.06 : 0.08)
+            ring.strokeColor = (index == 1 ? GameTheme.vermilion : accent).withAlphaComponent(index == 1 ? 0.06 : 0.08)
             ring.lineWidth = index == 0 ? 1.4 : 0.8
             ring.position = ringCenter
             backgroundLayer.addChild(ring)
@@ -539,7 +544,7 @@ class BaseScene: SKScene, PressableNodeDelegate {
             let angle = CGFloat(index) * .pi / 12
             let length: CGFloat = index % 3 == 0 ? 13 : 7
             let tick = SKShapeNode(rectOf: CGSize(width: 1, height: length))
-            tick.fillColor = (index % 6 == 0 ? GameTheme.vermilion : GameTheme.freezeBlue).withAlphaComponent(0.14)
+            tick.fillColor = (index % 6 == 0 ? GameTheme.vermilion : accent).withAlphaComponent(0.14)
             tick.strokeColor = .clear
             tick.position = CGPoint(x: 0, y: 110).rotated(by: -angle) + ringCenter
             tick.zRotation = -angle
@@ -553,7 +558,7 @@ class BaseScene: SKScene, PressableNodeDelegate {
             path.move(to: CGPoint(x: startX, y: -size.height / 2 + 14))
             path.addLine(to: CGPoint(x: 0, y: horizonY))
             let ray = SKShapeNode(path: path)
-            ray.strokeColor = GameTheme.freezeBlue.withAlphaComponent(0.055)
+            ray.strokeColor = accent.withAlphaComponent(0.055)
             ray.lineWidth = 0.7
             backgroundLayer.addChild(ray)
         }
@@ -562,7 +567,7 @@ class BaseScene: SKScene, PressableNodeDelegate {
             let eased = fraction * fraction
             let y = horizonY - eased * (size.height / 2 + horizonY - 14)
             let line = SKShapeNode(rectOf: CGSize(width: max(0, size.width - 30), height: 0.7))
-            line.fillColor = GameTheme.freezeBlue.withAlphaComponent(0.045 + fraction * 0.025)
+            line.fillColor = accent.withAlphaComponent(0.045 + fraction * 0.025)
             line.strokeColor = .clear
             line.position.y = y
             backgroundLayer.addChild(line)
@@ -581,7 +586,7 @@ class BaseScene: SKScene, PressableNodeDelegate {
 
         for side in [-1.0, 1.0] {
             let rail = SKShapeNode(rectOf: CGSize(width: min(68, size.width * 0.18), height: 2))
-            rail.fillColor = side < 0 ? GameTheme.freezeBlue : GameTheme.vermilion
+            rail.fillColor = side < 0 ? accent : GameTheme.vermilion
             rail.strokeColor = .clear
             rail.position = CGPoint(x: CGFloat(side) * (size.width / 2 - 48), y: size.height / 2 - 14)
             backgroundLayer.addChild(rail)

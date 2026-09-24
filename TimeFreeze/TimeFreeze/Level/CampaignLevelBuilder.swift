@@ -54,15 +54,31 @@ final class CampaignLevelBuilder {
         random: inout SeededRandom
     ) -> LevelDefinition {
         switch index {
-        case 1, 2: return buildFoundationTiming(id: id, variant: index, random: &random)
-        case 3, 4: return buildFoundationPair(id: id, variant: index, random: &random)
-        case 5, 6: return buildFoundationGate(id: id, variant: index, random: &random)
-        case 7, 8: return buildFoundationDrag(id: id, variant: index, random: &random)
-        case 9, 10: return buildFoundationDirection(id: id, variant: index, random: &random)
-        case 11, 12: return buildFoundationGravity(id: id, variant: index, random: &random)
-        case 13, 14: return buildFoundationPortal(id: id, variant: index, random: &random)
-        case 15, 16: return buildFoundationMachine(id: id, variant: index, random: &random)
-        case 17, 18: return buildFoundationChain(id: id, variant: index, random: &random)
+        // The opening levels front-load the chapter's richest mechanics so the
+        // first minutes of play show a machine, not a stopwatch. Freeze, then
+        // drag-while-frozen, then a switch, then a conveyor-and-gate machine,
+        // then a portal hop — five levels that each add a new moving part.
+        // Every mechanic that was pulled forward still returns in its harder
+        // form later in the chapter, so the course reads as a tour that keeps
+        // rewarding rather than a single-mechanic drip.
+        case 1: return buildFoundationTiming(id: id, variant: 1, random: &random)
+        case 2: return buildFoundationDrag(id: id, variant: 7, random: &random)
+        case 3: return buildFoundationGate(id: id, variant: 5, random: &random)
+        case 4: return buildFoundationMachine(id: id, variant: 15, random: &random)
+        case 5: return buildFoundationPortal(id: id, variant: 13, random: &random)
+        case 6: return buildFoundationTiming(id: id, variant: 2, random: &random)
+        case 7: return buildFoundationDrag(id: id, variant: 8, random: &random)
+        case 8: return buildFoundationPair(id: id, variant: 3, random: &random)
+        case 9: return buildFoundationPair(id: id, variant: 4, random: &random)
+        case 10: return buildFoundationGate(id: id, variant: 6, random: &random)
+        case 11: return buildFoundationDirection(id: id, variant: 9, random: &random)
+        case 12: return buildFoundationDirection(id: id, variant: 10, random: &random)
+        case 13: return buildFoundationGravity(id: id, variant: 11, random: &random)
+        case 14: return buildFoundationGravity(id: id, variant: 12, random: &random)
+        case 15: return buildFoundationPortal(id: id, variant: 14, random: &random)
+        case 16: return buildFoundationMachine(id: id, variant: 16, random: &random)
+        case 17: return buildFoundationChain(id: id, variant: 17, random: &random)
+        case 18: return buildFoundationChain(id: id, variant: 18, random: &random)
         default: return buildFoundationMaster(id: id, variant: index, random: &random)
         }
     }

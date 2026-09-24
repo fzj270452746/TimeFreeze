@@ -67,6 +67,9 @@ final class LeaderboardScene: BaseScene {
     /// by the node itself. See `buildTabs()` for why.
     private var pressedTab: PressableNode?
     private let statusLabel = GameTheme.label("", size: 12, color: GameTheme.textSecondary)
+    /// Pinned caption shown above the sample board when the live table is
+    /// unreachable, so the demo rows are not mistaken for real players.
+    private let sampleNote = GameTheme.label("", size: 10, color: GameTheme.textSecondary, weight: .bold)
     private var rowPitch: CGFloat { Layout.rowHeight + Layout.rowGap }
 
     private var tabsBottomY: CGFloat = 0
@@ -79,6 +82,9 @@ final class LeaderboardScene: BaseScene {
     private var me: CloudLeaderboardEntry?
     private var state: LoadState = .loading
     private var loadToken = 0
+    /// True while the built-in sample board stands in for a live one, so the
+    /// sample caption shows and the offline status text does not.
+    private var isShowingSamples = false
 
     private var scrollOffset: CGFloat = 0
     private var scrollMinY: CGFloat = 0
@@ -181,6 +187,10 @@ final class LeaderboardScene: BaseScene {
         statusLabel.numberOfLines = 0
         statusLabel.position = CGPoint(x: 0, y: 0)
         addChild(statusLabel)
+        sampleNote.text = GameText.leaderboardSample
+        sampleNote.isHidden = true
+        sampleNote.zPosition = 1
+        addChild(sampleNote)
     }
 
     /// Recomputes the band the list scrolls inside from the furniture actually
@@ -194,6 +204,10 @@ final class LeaderboardScene: BaseScene {
         // own standing is never hidden behind the footer.
         listBottomY = safeBottom + (me == nil ? 20 : 20 + rowPitch)
         statusLabel.position = CGPoint(x: 0, y: (listTopY + listBottomY) / 2)
+        // The sample caption sits in the narrow band above the first row, clear
+        // of the tabs and the header, and is pinned so it never scrolls away.
+        sampleNote.position = CGPoint(x: 0, y: listTopY - 10)
+        sampleNote.isHidden = !isShowingSamples
         // The crop mask has to cover the full scrollable band; anything outside it
         // is clipped away, which is what keeps rows off the header and tabs.
         let bandHeight = max(1, listTopY - listBottomY)
@@ -214,7 +228,7 @@ final class LeaderboardScene: BaseScene {
         loadToken += 1
         let token = loadToken
         guard SyncEngine.shared.isEnabled else {
-            apply(state: .unavailable, entries: [], me: nil)
+            applySample(state: .unavailable)
             return
         }
         apply(state: .loading, entries: [], me: nil)
@@ -231,15 +245,31 @@ final class LeaderboardScene: BaseScene {
                 apply(state: .loaded, entries: response.entries, me: response.me)
             } catch {
                 guard token == loadToken else { return }
-                apply(state: .failed, entries: [], me: nil)
+                applySample(state: .failed)
             }
         }
     }
 
     private func apply(state newState: LoadState, entries newEntries: [CloudLeaderboardEntry], me newMe: CloudLeaderboardEntry?) {
+        isShowingSamples = false
         state = newState
         entries = newEntries
         me = newMe
+        layoutBand()
+        rebuildRows()
+    }
+
+    /// Renders the built-in sample board instead of an empty or failed state.
+    ///
+    /// The sample rows are not folded into `PlayerProgress` — like the live
+    /// board, this screen only reads, and the demo entries live in
+    /// `SampleLeaderboard` rather than in the save.
+    private func applySample(state newState: LoadState) {
+        let sample = SampleLeaderboard.entries(for: board)
+        isShowingSamples = true
+        state = newState
+        entries = sample.entries
+        me = sample.me
         layoutBand()
         rebuildRows()
     }
@@ -289,6 +319,9 @@ final class LeaderboardScene: BaseScene {
     }
 
     private func statusText() -> String {
+        // The sample caption carries the message when the built-in board is up,
+        // so the empty/offline text does not double up beneath it.
+        if isShowingSamples { return "" }
         switch state {
         case .loading: return GameText.loading
         case .unavailable: return GameText.leaderboardOffline

@@ -7,7 +7,8 @@ enum MahjongTileRenderer {
         face: MahjongFace,
         team: TileTeam,
         size: CGSize = LayoutMetrics.tileSize,
-        compact: Bool = false
+        compact: Bool = false,
+        skin: TileSkin = .classic
     ) -> SKNode {
         let root = SKNode()
         root.name = "tileFace"
@@ -17,14 +18,14 @@ enum MahjongTileRenderer {
         shadow.position = CGPoint(x: 2.8, y: -4)
         root.addChild(shadow)
         let edge = SKShapeNode(rectOf: size, cornerRadius: min(7, size.width * 0.15))
-        edge.fillColor = edgeColor(team)
+        edge.fillColor = edgeColor(team, skin: skin)
         edge.strokeColor = UIColor.black.withAlphaComponent(0.3)
         edge.lineWidth = 1
         edge.position.y = -2
         root.addChild(edge)
         let surfaceSize = CGSize(width: size.width - 3, height: size.height - 5)
         let surface = SKShapeNode(rectOf: surfaceSize, cornerRadius: min(6, size.width * 0.13))
-        surface.fillColor = surfaceColor(team)
+        surface.fillColor = surfaceColor(team, skin: skin)
         surface.strokeColor = UIColor.white.withAlphaComponent(0.58)
         surface.lineWidth = 1.2
         surface.position.y = 1
@@ -62,30 +63,52 @@ enum MahjongTileRenderer {
         node.addChild(ring)
     }
 
-    static func makeGhost(from tile: TileDefinition) -> SKNode {
-        let node = makeFaceNode(suit: tile.suit, face: tile.face, team: .blue)
+    static func makeGhost(from tile: TileDefinition, skin: TileSkin = .classic) -> SKNode {
+        let node = makeFaceNode(suit: tile.suit, face: tile.face, team: .blue, skin: skin)
         node.alpha = 0.22
         node.setScale(0.96)
         return node
     }
 
-    private static func surfaceColor(_ team: TileTeam) -> UIColor {
+    private static func surfaceColor(_ team: TileTeam, skin: TileSkin) -> UIColor {
+        guard let tint = teamTint(team) else { return skin.surfaceBase }
+        return skin.surfaceBase.blended(with: tint, amount: surfaceBlend(team))
+    }
+
+    private static func edgeColor(_ team: TileTeam, skin: TileSkin) -> UIColor {
+        guard let tint = teamTint(team) else { return skin.edgeBase }
+        return skin.edgeBase.blended(with: tint, amount: edgeBlend(team))
+    }
+
+    /// The colour a team adds to a tile's body. Ivory tiles are the neutral base,
+    /// so they carry no tint of their own.
+    private static func teamTint(_ team: TileTeam) -> UIColor? {
         switch team {
-        case .ivory: return GameTheme.ivory
-        case .jade: return GameTheme.ivory.blended(with: GameTheme.jade, amount: 0.17)
-        case .red: return GameTheme.ivory.blended(with: GameTheme.vermilion, amount: 0.15)
-        case .blue: return GameTheme.ivory.blended(with: GameTheme.freezeBlue, amount: 0.18)
-        case .gold: return GameTheme.ivory.blended(with: GameTheme.brassLight, amount: 0.2)
+        case .ivory: return nil
+        case .jade: return GameTheme.jade
+        case .red: return GameTheme.vermilion
+        case .blue: return GameTheme.freezeBlue
+        case .gold: return GameTheme.brassLight
         }
     }
 
-    private static func edgeColor(_ team: TileTeam) -> UIColor {
+    private static func surfaceBlend(_ team: TileTeam) -> CGFloat {
         switch team {
-        case .ivory: return GameTheme.ivoryShadow
-        case .jade: return GameTheme.jade.blended(with: GameTheme.background, amount: 0.25)
-        case .red: return GameTheme.vermilion.blended(with: GameTheme.background, amount: 0.28)
-        case .blue: return GameTheme.freezeBlue.blended(with: GameTheme.background, amount: 0.3)
-        case .gold: return GameTheme.brass
+        case .ivory: return 0
+        case .jade: return 0.17
+        case .red: return 0.15
+        case .blue: return 0.18
+        case .gold: return 0.20
+        }
+    }
+
+    private static func edgeBlend(_ team: TileTeam) -> CGFloat {
+        switch team {
+        case .ivory: return 0
+        case .jade: return 0.45
+        case .red: return 0.45
+        case .blue: return 0.45
+        case .gold: return 0.55
         }
     }
 

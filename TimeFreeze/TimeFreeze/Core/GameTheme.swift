@@ -61,6 +61,7 @@ enum GameTheme {
     }
 
     static func roundedPanel(size: CGSize, radius: CGFloat = 8, fill: UIColor = panel) -> SKShapeNode {
+        let accent = SaveStore.shared.settings.tileSkin.accent
         let cut = min(radius, min(size.width, size.height) * 0.18)
         let panel = SKShapeNode(path: chamferedPath(size: size, cut: cut))
         panel.fillColor = fill
@@ -69,12 +70,12 @@ enum GameTheme {
         let insetSize = CGSize(width: max(1, size.width - 8), height: max(1, size.height - 8))
         let inset = SKShapeNode(path: chamferedPath(size: insetSize, cut: max(2, cut - 2)))
         inset.fillColor = .clear
-        inset.strokeColor = freezeBlue.withAlphaComponent(0.13)
+        inset.strokeColor = accent.withAlphaComponent(0.13)
         inset.lineWidth = 0.7
         panel.addChild(inset)
 
         let topRail = SKShapeNode(rectOf: CGSize(width: min(54, size.width * 0.22), height: 2))
-        topRail.fillColor = freezeBlue
+        topRail.fillColor = accent
         topRail.strokeColor = .clear
         topRail.position = CGPoint(x: -size.width / 2 + min(38, size.width * 0.18), y: size.height / 2 - 1)
         panel.addChild(topRail)

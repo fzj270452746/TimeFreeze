@@ -348,6 +348,7 @@ final class GameScene: SKScene,
     private func updateChronoState(_ state: TimeState) {
         scanline.removeAllActions()
         chronoFrame.removeAllActions()
+        freezeVeil.removeAllActions()
         chronoFrame.glowWidth = 0
         scanline.alpha = 0
         switch state {
@@ -356,7 +357,15 @@ final class GameScene: SKScene,
             chronoFrame.strokeColor = GameTheme.divider
         case .frozen:
             freezeVeil.fillColor = GameTheme.freezeBlue
-            freezeVeil.alpha = 0.035
+            // A quick pulse marks the instant time stops; it settles into the
+            // faint sustained veil rather than holding at the flash level, so
+            // repeated freezes read as a beat instead of a strobe.
+            if SaveStore.shared.settings.reduceMotion {
+                freezeVeil.alpha = 0.035
+            } else {
+                freezeVeil.alpha = 0.20
+                freezeVeil.run(.fadeAlpha(to: 0.035, duration: 0.28))
+            }
             chronoFrame.strokeColor = GameTheme.freezeBlue
             chronoFrame.glowWidth = 5
             startScanline(color: GameTheme.freezeBlue, duration: 1.7)

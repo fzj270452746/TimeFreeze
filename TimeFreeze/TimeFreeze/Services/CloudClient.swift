@@ -104,6 +104,25 @@ struct CloudLeaderboardEntry: Codable {
     var achievementsUnlocked: Int?
 }
 
+extension CloudLeaderboardEntry {
+    /// Constructs a bare entry for the built-in sample board, where only the
+    /// metric the board ranks on is filled in. The untouched fields stay nil
+    /// and are never read by that board's row. Lives in an extension so the
+    /// memberwise initialiser the decoder path relies on stays synthesised.
+    init(rank: Int, playerID: String, displayName: String) {
+        self.rank = rank
+        self.playerID = playerID
+        self.displayName = displayName
+        self.totalStars = nil
+        self.completedLevels = nil
+        self.bestStage = nil
+        self.bestScore = nil
+        self.score = nil
+        self.stars = nil
+        self.achievementsUnlocked = nil
+    }
+}
+
 struct CloudLeaderboardResponse: Codable {
     var type: String
     var entries: [CloudLeaderboardEntry]

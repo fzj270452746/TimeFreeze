@@ -3,6 +3,7 @@ import Foundation
 
 enum AppFlowState: String, Codable {
     case boot
+    case onboarding
     case menu
     case chapterSelect
     case levelSelect
@@ -16,6 +17,7 @@ enum AppFlowState: String, Codable {
     case settings
     case mastery
     case leaderboard
+    case skins
     case transition
 }
 
@@ -554,8 +556,28 @@ struct GameSettings: Codable, Equatable {
     var tutorialHints = true
     var leftHandedControls = false
     var audioVolume: CGFloat = 0.75
+    var tileSkin: TileSkin = .classic
 
     static let standard = GameSettings()
+
+    init() {}
+
+    /// Decoded field by field rather than with the synthesised decoder: a
+    /// settings blob written before `tileSkin` existed lacks that key, and the
+    /// synthesised decoder would reject the whole blob and silently fall back to
+    /// `.standard`, dropping the player's sound, haptics and other preferences.
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        soundEnabled = try container.decodeIfPresent(Bool.self, forKey: .soundEnabled) ?? true
+        ambientEnabled = try container.decodeIfPresent(Bool.self, forKey: .ambientEnabled) ?? true
+        hapticsEnabled = try container.decodeIfPresent(Bool.self, forKey: .hapticsEnabled) ?? true
+        reduceMotion = try container.decodeIfPresent(Bool.self, forKey: .reduceMotion) ?? false
+        highContrast = try container.decodeIfPresent(Bool.self, forKey: .highContrast) ?? false
+        tutorialHints = try container.decodeIfPresent(Bool.self, forKey: .tutorialHints) ?? true
+        leftHandedControls = try container.decodeIfPresent(Bool.self, forKey: .leftHandedControls) ?? false
+        audioVolume = try container.decodeIfPresent(CGFloat.self, forKey: .audioVolume) ?? 0.75
+        tileSkin = try container.decodeIfPresent(TileSkin.self, forKey: .tileSkin) ?? .classic
+    }
 }
 
 struct LevelProgress: Codable, Hashable {
@@ -612,6 +634,7 @@ struct PlayerProgress: Codable {
     var endlessBestStage = 0
     var dailyResults: [String: LevelResult] = [:]
     var tutorialKeysSeen: Set<String> = []
+    var hasSeenOnboarding = false
     var firstLaunch = Date()
     var lastLaunch = Date()
     var currentStreak = 0
@@ -648,6 +671,7 @@ struct PlayerProgress: Codable {
         endlessBestStage = try container.decodeIfPresent(Int.self, forKey: .endlessBestStage) ?? 0
         dailyResults = try container.decodeIfPresent([String: LevelResult].self, forKey: .dailyResults) ?? [:]
         tutorialKeysSeen = try container.decodeIfPresent(Set<String>.self, forKey: .tutorialKeysSeen) ?? []
+        hasSeenOnboarding = try container.decodeIfPresent(Bool.self, forKey: .hasSeenOnboarding) ?? false
         firstLaunch = try container.decodeIfPresent(Date.self, forKey: .firstLaunch) ?? Date()
         lastLaunch = try container.decodeIfPresent(Date.self, forKey: .lastLaunch) ?? Date()
         currentStreak = try container.decodeIfPresent(Int.self, forKey: .currentStreak) ?? 0

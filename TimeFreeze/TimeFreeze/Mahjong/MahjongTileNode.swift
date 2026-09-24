@@ -31,7 +31,7 @@ final class MahjongTileNode: SKNode, WorldObject, FrozenInteractable {
         initialRotation = definition.rotation
         lastValidPosition = definition.position.cgPoint
         motionController = MotionControllerFactory.make(definition: definition.motion, start: definition.position.cgPoint)
-        faceNode = MahjongTileRenderer.makeFaceNode(suit: definition.suit, face: definition.face, team: definition.team)
+        faceNode = MahjongTileRenderer.makeFaceNode(suit: definition.suit, face: definition.face, team: definition.team, skin: SaveStore.shared.settings.tileSkin)
         super.init()
         name = "tile:\(definition.id)"
         position = initialPosition

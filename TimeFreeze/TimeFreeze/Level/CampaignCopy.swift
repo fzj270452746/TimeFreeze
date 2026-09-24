@@ -12,10 +12,10 @@ enum CampaignCopy {
 
     private static let titlesByChapter: [[String]] = [
         [
-            "OPENING WINDOW", "RETURN PASS", "CROSSING PAIR", "ORBIT RENDEZVOUS",
-            "LIVE SWITCH", "TURNSTILE", "STILL HAND", "CORNER POCKET",
-            "UPWARD WIND", "DOWNWARD WIND", "DROP ZONE", "HEAVY NINE",
-            "PORTAL HOP", "EXIT ANGLE", "POWER ROUTE", "BELT AND RAIL",
+            "FIRST FREEZE", "STILL HAND", "LIVE SWITCH", "POWER ROUTE",
+            "PORTAL HOP", "RETURN PASS", "CORNER POCKET", "CROSSING PAIR",
+            "ORBIT RENDEZVOUS", "TURNSTILE", "UPWARD WIND", "DOWNWARD WIND",
+            "DROP ZONE", "HEAVY NINE", "EXIT ANGLE", "BELT AND RAIL",
             "TWIN ARRIVAL", "THREE-WAY SETTLE", "THREE ROUTES", "ROLL BACK"
         ],
         [

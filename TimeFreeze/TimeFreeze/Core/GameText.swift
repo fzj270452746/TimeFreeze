@@ -10,6 +10,10 @@ enum GameText {
     static let dailyPuzzle = "Daily Puzzle"
     static let settings = "Settings"
     static let achievements = "Mastery"
+    static let skins = "Skins"
+    static let skinsSubtitle = "Restyle the tiles. Earn stars to unlock."
+    static let equipped = "EQUIPPED"
+    static let tapToEquip = "TAP TO EQUIP"
     static let back = "Back"
     static let pause = "Pause"
     static let resume = "Resume"
@@ -48,6 +52,10 @@ enum GameText {
     static let leaderboardEmpty = "No scores on this board yet."
     static let leaderboardFailed = "Could not reach the table."
     static let leaderboardOffline = "Leaderboards are unavailable right now."
+    /// Pinned over the built-in sample board that stands in while the live
+    /// table is unreachable, so the demo scores are never mistaken for real
+    /// players.
+    static let leaderboardSample = "SAMPLE SCORES · OFFLINE"
     /// Stands in for a hidden mark's title and detail until it is earned. The
     /// detail is withheld rather than shown greyed out, because it states the
     /// condition and would give the secret away.

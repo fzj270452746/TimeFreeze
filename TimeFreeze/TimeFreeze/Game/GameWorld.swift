@@ -107,7 +107,7 @@ final class GameWorld: SKNode, TimeControllerDelegate {
             return false
         }
         if enteringFreeze {
-            effects.emitFreezeWave(at: point, maximumRadius: max(definition.boardSize.width, definition.boardSize.height) * 0.75)
+            effects.emitFreezeBurst(at: point, maximumRadius: max(definition.boardSize.width, definition.boardSize.height) * 0.75)
             eventBus.publish(.timeFrozen(position: point))
             AudioService.shared.play(.freeze)
             AudioService.shared.setFreezeLayer(true)

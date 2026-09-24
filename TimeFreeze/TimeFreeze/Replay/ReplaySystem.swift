@@ -199,7 +199,7 @@ final class GhostReplayNode: SKNode {
         zPosition = 25
         alpha = 0.42
         for definition in tileDefinitions {
-            let node = MahjongTileRenderer.makeGhost(from: definition)
+            let node = MahjongTileRenderer.makeGhost(from: definition, skin: SaveStore.shared.settings.tileSkin)
             node.isHidden = true
             addChild(node)
             ghostTiles[definition.id] = node
