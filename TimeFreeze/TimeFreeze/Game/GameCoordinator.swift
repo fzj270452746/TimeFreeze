@@ -19,6 +19,8 @@ final class GameCoordinator {
 
     func attach(to view: SKView) {
         skView = view
+        flowState = .boot
+
         AudioService.shared.start()
         SyncEngine.shared.start()
     }
@@ -47,7 +49,7 @@ final class GameCoordinator {
         guard let view = skView else { return }
         flowState = .boot
         let scene = LaunchScene(size: view.bounds.size)
-        present(scene, transition: .crossFade(withDuration: 0.15))
+        present(scene, transition: .crossFade(withDuration: 0.1))
     }
 
     func showMenu(push: Bool = false) {
@@ -153,6 +155,7 @@ final class GameCoordinator {
     func startLevel(_ definition: LevelDefinition) {
         navigationStack.removeAll()
         currentLevel = definition
+        AnalyticsService.shared.trackLevelStarted(definition)
         flowState = .levelLoading
         let loading = LevelLoadingScene(size: sceneSize, definition: definition) { [weak self] in
             self?.presentGame(definition)
@@ -167,6 +170,7 @@ final class GameCoordinator {
 
     func levelDidComplete(_ result: LevelResult) {
         guard let level = currentLevel else { return }
+        AnalyticsService.shared.trackLevelAchieved(result, chapter: level.chapter)
         let unlockedBefore = unlockedChapters()
         // A copy, not a reference: `PlayerProgress` is a struct, so this stays
         // put while the branches below write. The marks earned are the
@@ -176,7 +180,9 @@ final class GameCoordinator {
         let progressBefore = SaveStore.shared.progress
         if (1...200).contains(level.id) { SaveStore.shared.record(result) }
         if level.mode == .daily {
-            SaveStore.shared.recordDaily(key: ProceduralLevelGenerator.dayKey(for: Date()), result: result)
+            let dayKey = ProceduralLevelGenerator.dayKey(for: Date())
+            SaveStore.shared.recordDaily(key: dayKey, result: result)
+            AnalyticsService.shared.trackDailyCompleted(result, dayKey: dayKey)
         }
         if level.mode == .endless {
             endlessRun?.record(score: result.score)
@@ -186,6 +192,9 @@ final class GameCoordinator {
             before: progressBefore,
             after: SaveStore.shared.progress
         )
+        for definition in earned {
+            AnalyticsService.shared.trackAchievementUnlocked(definition)
+        }
         // Clearing the opening level of a chapter opens the next one; that is the
         // only moment the unlock tag is worth playing. The banner plays the same
         // tag when a mark lands, and the two can fall on the same board — the
@@ -205,6 +214,7 @@ final class GameCoordinator {
     }
 
     func levelDidFail(_ reason: FailureKind) {
+        AnalyticsService.shared.trackLevelFailed(reason: reason, level: currentLevel)
         flowState = .failure
         activeGameScene?.showFailure(reason)
     }

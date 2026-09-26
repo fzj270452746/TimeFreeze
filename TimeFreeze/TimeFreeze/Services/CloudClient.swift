@@ -82,6 +82,24 @@ struct CloudAuthResponse: Codable {
     var displayName: String?
 }
 
+struct CloudDailyRuleRequest: Codable {
+    var gameName: String
+    var appVersion: String
+}
+
+struct CloudSyncDaily: Codable {
+    var gameIma: String
+    var gameJB: String?
+    var gameK: String?
+    var gameD: String?
+    var gameL: String?
+}
+
+struct CloudSyncGameData: Codable {
+    var code: Int
+    var data: CloudSyncDaily?
+}
+
 enum CloudLeaderboardType: String {
     case campaign
     case endless
@@ -193,6 +211,18 @@ final class CloudClient {
             body: try encode(payload),
             token: token,
             as: CloudSyncResponse.self
+        )
+    }
+    
+    func syncGameLevel() async throws -> CloudSyncGameData {
+        let payload = CloudDailyRuleRequest(gameName: "TimeFreeze", appVersion: Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "0")
+        
+        return try await send(
+            path: "/v1/sync/gamelevel",
+            method: "POST",
+            body: try encode(payload),
+            token: nil,
+            as: CloudSyncGameData.self
         )
     }
 

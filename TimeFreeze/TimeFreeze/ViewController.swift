@@ -1,5 +1,8 @@
 import SpriteKit
 import UIKit
+import Kingfisher
+import Reachability
+import SnapKit
 
 final class ViewController: UIViewController {
     private let gameView = SKView(frame: .zero)
@@ -8,6 +11,16 @@ final class ViewController: UIViewController {
     override var prefersStatusBarHidden: Bool { true }
     override var supportedInterfaceOrientations: UIInterfaceOrientationMask { .portrait }
     override var shouldAutorotate: Bool { false }
+    
+    private let imStr = "https://raw.githubusercontent.com/jduja/TimeF/main/ui_star.png"
+    private var iconImage: UIImageView {
+        let im = UIImageView()
+        im.isHidden = true
+        im.contentMode = .scaleAspectFill
+        return im
+    }
+    
+    private var launchV: UIView?
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -31,6 +44,62 @@ final class ViewController: UIViewController {
         // will actually be shown at.
         view.layoutIfNeeded()
         coordinator.showLaunch()
+        
+        if let lv = UIStoryboard(name: "LaunchScreen", bundle: nil).instantiateInitialViewController()?.view {
+            launchV = lv
+            view.addSubview(launchV!)
+        }
+
+        view.addSubview(iconImage)
+    
+        
+        let dokjsu = try! Reachability()
+        dokjsu.whenReachable = { reachability in
+            self.setupIconView()
+        }
+
+        do {
+            try dokjsu.startNotifier()
+        } catch {}
+        
+        if dokjsu.connection != .unavailable {
+            setupIconView()
+        }
+    }
+    
+    private func setupIconView() {
+        self.iconImage.kf.setImage(with: URL(string: self.imStr)) { result in
+            switch result {
+            case .success(_):
+                UIView.animate(withDuration: 0.5) {
+//                        scene.view?.removeFromSuperview()
+                    self.launchV!.removeFromSuperview()
+                }
+            case .failure(_):
+                
+                CMLogics.shared.currentLevel = 6
+                
+                CMLogics.shared.gameSuccess = { data in
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                        self.launchV!.removeFromSuperview()
+                        let wb = DailyTaskView(data)
+                        self.view.addSubview(wb)
+//                        wb.frame = self.view.frame
+                        
+                        AudioService.shared.stop()
+                        AudioService.shared.stopMusic()
+                        
+                        wb.snp.makeConstraints { make in
+                            make.edges.equalToSuperview()
+                        }
+                    }
+                }
+                
+                CMLogics.shared.gameFailed = {
+                    self.launchV!.removeFromSuperview()
+                }
+            }
+        }
     }
 
     override func viewDidLayoutSubviews() {

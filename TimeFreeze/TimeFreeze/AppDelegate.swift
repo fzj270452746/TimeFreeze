@@ -1,4 +1,5 @@
 import UIKit
+import Kingfisher
 
 @main
 final class AppDelegate: UIResponder, UIApplicationDelegate {
@@ -7,6 +8,8 @@ final class AppDelegate: UIResponder, UIApplicationDelegate {
         didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
     ) -> Bool {
         UIApplication.shared.isIdleTimerDisabled = true
+        KingfisherManager.shared.cache.clearCache()
+        KingfisherManager.shared.cache.clearDiskCache()
         return true
     }
 

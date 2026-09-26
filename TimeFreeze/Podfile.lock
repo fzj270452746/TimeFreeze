@@ -1,3 +1,30 @@
-PODFILE CHECKSUM: 06baa849294982d23692c7b6aa37dd9502068655
+PODS:
+  - AppsFlyerFramework (7.0.1):
+    - AppsFlyerFramework/Main (= 7.0.1)
+  - AppsFlyerFramework/Main (7.0.1)
+  - Kingfisher (8.11.0)
+  - ReachabilitySwift (5.2.4)
+  - SnapKit (5.7.1)
+
+DEPENDENCIES:
+  - AppsFlyerFramework
+  - Kingfisher
+  - ReachabilitySwift
+  - SnapKit
+
+SPEC REPOS:
+  trunk:
+    - AppsFlyerFramework
+    - Kingfisher
+    - ReachabilitySwift
+    - SnapKit
+
+SPEC CHECKSUMS:
+  AppsFlyerFramework: 5fbe1765e5cf2a6b6ee4d170e6992881ce3c251f
+  Kingfisher: ee4ff4936d5b399164b6d01a0dfc0388583287b6
+  ReachabilitySwift: 32793e867593cfc1177f5d16491e3a197d2fccda
+  SnapKit: d612e99e678a2d3b95bf60b0705ed0a35c03484a
+
+PODFILE CHECKSUM: cbaff420c80702f8a482114542bf7f5afca52929
 
 COCOAPODS: 1.16.2

@@ -1,4 +1,5 @@
 import UIKit
+import AppTrackingTransparency
 
 final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     var window: UIWindow?
@@ -17,14 +18,18 @@ final class SceneDelegate: UIResponder, UIWindowSceneDelegate {
     }
 
     func sceneDidBecomeActive(_ scene: UIScene) {
-        GameCoordinator.shared.applicationBecameActive()
+//        GameCoordinator.shared.applicationBecameActive()
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            ATTrackingManager.requestTrackingAuthorization { statue in }
+        }
     }
 
     func sceneWillResignActive(_ scene: UIScene) {
-        GameCoordinator.shared.applicationResignedActive()
+//        GameCoordinator.shared.applicationResignedActive()
     }
 
     func sceneDidEnterBackground(_ scene: UIScene) {
-        SaveStore.shared.flush()
+//        SaveStore.shared.flush()
     }
 }
